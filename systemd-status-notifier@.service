@@ -1,0 +1,8 @@
+[Unit]
+Description=systemd status notifier
+After=network.target
+Documentation=https://github.com/disisto/systemd-status-notifier
+
+[Service]
+Type=simple
+ExecStart=/bin/systemd-status-notifier.sh
