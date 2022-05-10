@@ -2,7 +2,7 @@
 
 #**
 #    systemd status notifier
-#    Version 0.1
+#    Version 0.1.1
 #
 #    A bash script that triggers an Email, Mattermost, PagerDuty, Slack and/or SMS (sipgate) notification 
 #    when an enabled systemd service is in a failed condition.
@@ -184,11 +184,12 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
     ### Trigger Email notification
 	if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "email"); then
 		(
+		  sirenEmoji=(=?utf-8?Q?=F0=9F=9A=A8?=)
 		  echo "From: $EMAIL_SENDER "
 		  echo "To: $emailRecipient "
 		  echo "MIME-Version: 1.0"
 		  echo "Content-Type: text/html; " 
-		  echo "Subject: systemd Monitor: $systemdService on `hostname` is DOWN! (`date +"%Y-%m-%d %T"`)" 
+		  echo "Subject: $sirenEmoji systemd Monitor: $systemdService on `hostname` is DOWN! (`date +"%Y-%m-%d %T"`)" 
 		  echo "" 
 		  echo "<!doctype html>
 				  <html>
@@ -402,6 +403,7 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 
     SLACK_PAYLOAD="
 		{
+			\"text\": \":rotating_light: $systemdService on `hostname` is DOWN!\",
 			\"blocks\": [
 				{
 					\"type\": \"header\",
