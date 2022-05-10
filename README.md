@@ -55,4 +55,4 @@ This bash script allows you to be notified via Email, Mattermost, PagerDuty, Sla
 
 ---
 
-This project is not affiliated with <a href="https://mattermost.com/">Matterhost</a>, <a href="https://www.pagerduty.com/">PagerDuty</a>, <a href="https://www.sipgate.de/">sipgate</a> and/or <a href="https://www.sipgate.de/">Slack</a><br>All mentioned trademarks are the property of their respective owners.
+This project is not affiliated with <a href="https://mattermost.com/">Mattermost</a>, <a href="https://www.pagerduty.com/">PagerDuty</a>, <a href="https://www.sipgate.de/">sipgate</a> and/or <a href="https://www.sipgate.de/">Slack</a><br>All mentioned trademarks are the property of their respective owners.
