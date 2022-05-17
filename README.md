@@ -26,6 +26,7 @@ This bash script allows you to be notified via Email, Mattermost, PagerDuty, Sla
   - [Email notifications](https://github.com/disisto/systemd-status-notifier/wiki#email-notifications)
   - [Mattermost notifications](https://github.com/disisto/systemd-status-notifier/wiki#mattermost-notifications)
   - [PagerDuty notifications](https://github.com/disisto/systemd-status-notifier/wiki#pagerduty-notifications)
+  - [Pushover notifications](https://github.com/disisto/systemd-status-notifier/wiki#pushover-notifications)
   - [sipgate SMS notifications](https://github.com/disisto/systemd-status-notifier/wiki#sipgate-sms-notifications)
   - [Slack notifications](https://github.com/disisto/systemd-status-notifier/wiki#slack-notifications)
 
@@ -38,6 +39,7 @@ This bash script allows you to be notified via Email, Mattermost, PagerDuty, Sla
 | Email         | MTA    |
 | Mattermost    | API    |
 | PagerDuty     | API    |
+| Pushover      | API    |
 | sipgate (SMS) | API    |
 | Slack         | API    |
 
@@ -49,10 +51,10 @@ This bash script allows you to be notified via Email, Mattermost, PagerDuty, Sla
 
 - For Email notifications: Mail Transfer Agent (MTA) like `postfix`
 
-- For Mattermost/sipgate/Slack notifications: `cURL`
-
 - For PagerDuty API v2 notifications: `pdagent`
+
+- For all other notifications: `cURL`
 
 ---
 
-This project is not affiliated with <a href="https://mattermost.com/">Mattermost</a>, <a href="https://www.pagerduty.com/">PagerDuty</a>, <a href="https://www.sipgate.de/">sipgate</a> and/or <a href="https://www.sipgate.de/">Slack</a><br>All mentioned trademarks are the property of their respective owners.
+This project is not affiliated with <a href="https://mattermost.com/">Mattermost</a>, <a href="https://www.pagerduty.com/">PagerDuty</a>, <a href="https://pushover.net)">Pushover</a>,<a href="https://www.sipgate.de/">sipgate</a> and/or <a href="https://www.sipgate.de/">Slack</a><br>All mentioned trademarks are the property of their respective owners.
