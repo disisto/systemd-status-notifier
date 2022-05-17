@@ -4,7 +4,7 @@
 
 # systemd status notifier
 
-This bash script allows you to be notified via Email, Mattermost, PagerDuty, Slack and/or SMS (sipgate) when an enabled systemd service is in a failed condition.
+This bash script allows you to be notified via Email, Mattermost, PagerDuty, Pushover, Slack and/or SMS (sipgate) when an enabled systemd service is in a failed condition.
 
 <img src="https://github.com/disisto/systemd-status-notifier/raw/main/img/0_systemd-status-monitor.gif">
 
