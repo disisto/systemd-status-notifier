@@ -410,7 +410,8 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 				https://api.sipgate.com/v2/sessions/sms \
 				-H "Accept: application/json" \
 				-H "Content-Type: application/json" \
-				-d "$SIPGATE_PAYLOAD"
+				-d "$SIPGATE_PAYLOAD" \
+				> /dev/null
 
 		fi
 	done
@@ -506,7 +507,8 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 	          -X POST \
 			  -H 'Content-type: application/json' \
 			  --data "$SLACK_PAYLOAD" \
-			  $SLACK_WEBHOOK_URL
+			  $SLACK_WEBHOOK_URL \
+			  > /dev/null
 	fi
 
     ###############################
@@ -525,7 +527,8 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 	          -X POST \
 			  -H 'Content-type: application/json' \
 			  -d "$MATTERMOST_PAYLOAD" \
-			  $MATTERMOST_WEBHOOK_URL
+			  $MATTERMOST_WEBHOOK_URL \
+			  > /dev/null
 	fi
 
 
@@ -540,7 +543,8 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 			  --form-string "sound=siren" \
 			  --form-string "title=$systemdService on `hostname` is DOWN!" \
 			  --form-string "message=Event was logged on `date +"%b $d, %Y at %T (%Z)"`. Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService. | sed 's/\(.*\),/\1 and/'`" \
-			  https://api.pushover.net/1/messages.json
+			  https://api.pushover.net/1/messages.json \
+			  > /dev/null
 	fi
 
     ###############################
