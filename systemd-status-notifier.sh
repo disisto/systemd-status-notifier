@@ -2,7 +2,7 @@
 
 #**
 #    systemd status notifier
-#    Version 0.2.0
+#    Version 0.2.1
 #
 #    A bash script that triggers an Email, Mattermost, PagerDuty, Pushover, Slack and/or SMS (sipgate) notification 
 #    when an enabled systemd service is in a failed condition.
@@ -346,7 +346,7 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 											</table>
 											<br>
 											<p style='font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;'>Service Description: `systemctl show $systemdService -p Description | cut -d "=" -f2`</p>
-											<p style='font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;'>Event was logged on <b>`date +"%b$d, %Y at %T (%Z)"`</b>.</p>
+											<p style='font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;'>Event was logged on <b>`date +"%b $d, %Y at %T (%Z)"`</b>.</p>
 											<p style='font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;'>Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via <b>`echo $messagingService | sed 's/\(.*\),/\1 and/'`</b>.</p>
 											<p style='font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;'><br>Hope to have informed you sufficiently.</p>
 										</td>
@@ -404,7 +404,7 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 			"
 
 		### Trigger Slack notification
-			curl \
+			curl -s \
 				-X POST \
 				-u $SIPGATE_TOKEN \
 				https://api.sipgate.com/v2/sessions/sms \
@@ -492,7 +492,7 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 					\"elements\": [
 						{
 							\"type\": \"mrkdwn\",
-							\"text\": \"`date +"%b$d, %Y at %T (%Z)"` | This automated message was created with <https://github.com/disisto/systemd-status-notifier|systemd status notifier>\"
+							\"text\": \"`date +"%b $d, %Y at %T (%Z)"` | This automated message was created with <https://github.com/disisto/systemd-status-notifier|systemd status notifier>\"
 						}
 					]
 				}
@@ -502,7 +502,7 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 
     ### Trigger Slack notification
 	if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "slack"); then
-      curl \
+      curl -s \
 	          -X POST \
 			  -H 'Content-type: application/json' \
 			  --data "$SLACK_PAYLOAD" \
@@ -515,13 +515,13 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 
     MATTERMOST_PAYLOAD="
 		{
-			\"text\": \"#### :siren-motion: \`$systemdService\` on `hostname` is DOWN!\n\n| Monitor | Instance | Service | Status |\n|:-----------|:-----------:|:-----------------------------------------------|\n| systemd | `hostname` | $systemdService | DOWN |\n| \n *** \n ###### Service Description: `systemctl show $systemdService -p Description | cut -d "=" -f2` \n *** \n ###### Notification: Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService | sed 's/\(.*\),/\1 and/'` \n *** \n `date +"%b$d, %Y at %T (%Z)"` | This automated message was created with <https://github.com/disisto/systemd-status-notifier|systemd status notifier>\"
+			\"text\": \"#### :siren-motion: \`$systemdService\` on `hostname` is DOWN!\n\n| Monitor | Instance | Service | Status |\n|:-----------|:-----------:|:-----------------------------------------------|\n| systemd | `hostname` | $systemdService | DOWN |\n| \n *** \n ###### Service Description: `systemctl show $systemdService -p Description | cut -d "=" -f2` \n *** \n ###### Notification: Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService | sed 's/\(.*\),/\1 and/'` \n *** \n `date +"%b $d, %Y at %T (%Z)"` | This automated message was created with <https://github.com/disisto/systemd-status-notifier|systemd status notifier>\"
 		}
     "
 
 	### Trigger Mattermost notification
 	if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "mattermost"); then
-      curl \
+      curl -s \
 	          -X POST \
 			  -H 'Content-type: application/json' \
 			  -d "$MATTERMOST_PAYLOAD" \
@@ -534,12 +534,12 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
     ###############################
 
 	if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "pushover"); then
-      curl \
+      curl -s \
 			  --form-string "token=$PUSHOVER_TOKEN" \
 			  --form-string "user=$PUSHOVER_USER" \
 			  --form-string "sound=siren" \
 			  --form-string "title=$systemdService on `hostname` is DOWN!" \
-			  --form-string "message=Event was logged on `date +"%b$d, %Y at %T (%Z)"`. Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService. | sed 's/\(.*\),/\1 and/'`" \
+			  --form-string "message=Event was logged on `date +"%b $d, %Y at %T (%Z)"`. Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService. | sed 's/\(.*\),/\1 and/'`" \
 			  https://api.pushover.net/1/messages.json
 	fi
 
