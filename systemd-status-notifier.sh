@@ -2,9 +2,9 @@
 
 #**
 #    systemd status notifier
-#    Version 0.1.1
+#    Version 0.2.0
 #
-#    A bash script that triggers an Email, Mattermost, PagerDuty, Slack and/or SMS (sipgate) notification 
+#    A bash script that triggers an Email, Mattermost, PagerDuty, Pushover, Slack and/or SMS (sipgate) notification 
 #    when an enabled systemd service is in a failed condition.
 #
 #    Documentation: https://github.com/disisto/systemd-status-notifier
@@ -40,8 +40,8 @@
 SYSTEMD_SERVICES=(all getty@)
 
 ### Add here messaging services you want to use
-### Possibilities: "email", "mattermost", "pagerduty", "sipgate" and/or "slack"
-MESSAGING_SERVICES=(email mattermost pagerduty sipgate slack)
+### Possibilities: "email", "mattermost", "pagerduty", "pushover", "sipgate" and/or "slack"
+MESSAGING_SERVICES=(email mattermost pagerduty pushover sipgate slack)
 
 ### Add here the sender email address
 EMAIL_SENDER=(noreply@troubleshooting.tools)
@@ -61,13 +61,19 @@ SIPGATE_RECIPIENT=(+4900000000000 +31999999999)
 # ----------------------------------------------------------------------------------------------------------- #
 #                                                                                                             #
 # Mattermost Webhook URL                                                                                      #
-MATTERMOST_WEBHOOK_URL=https://mattermost.troubleshooting.tools/hooks/xx0xx0xxxxxxxxxxxxxx0xx0xx              #
+MATTERMOST_WEBHOOK_URL==https://mattermost.troubleshooting.tools/hooks/xx0xx0xxxxxxxxxxxxxx0xx0xx             #
 #                                                                                                             #
 # Slack Webhook URL                                                                                           #
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/X00XX0X0XXX/X00XXX00XXX/XXxxxxxxXxx0xxXxXX0X0xXX           #
 #                                                                                                             #
 # PagerDuty service key URL                                                                                   #
 PD_SERVICE_KEY=0x00x000xx00000xx000x00000xx0x00                                                               #
+#                                                                                                             #
+# Pushover application token                                                                                  #
+PUSHOVER_TOKEN=xxx00xxxx0xxxxx0xxxx0xxxxxxx0x                                                                 #
+#                                                                                                             #
+# Pushover user token                                                                                         #
+PUSHOVER_USER=xxxxxxxx0xx0xxxxx0xx0xx00xx0                                                                    #
 #                                                                                                             #
 # sipgate tockenid and token                                                                                  #
 SIPGATE_TOKEN=token-XXX00X:0000xx0x-xxx0-0x00-x0xx-00000x0xxx0x                                               #
@@ -110,6 +116,24 @@ if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "mattermost" && (( !${#M
 	exit
 fi
 
+if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "pagerduty" && (( !${#PD_SERVICE_KEY} )) ); 
+  then
+    echo -e "No PagerDuty service key set up: Undefined variable \$PD_SERVICE_KEY in `pwd`/`basename "$0"`."
+	exit
+fi
+
+if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "pushover" && (( !${#PUSHOVER_TOKEN} )) ); 
+  then
+    echo -e "No Pushover application token set up: Undefined variable \$PUSHOVER_TOKEN in `pwd`/`basename "$0"`."
+	exit
+fi
+
+if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "pushover" && (( !${#PUSHOVER_USER} )) ); 
+  then
+    echo -e "No Pushover user token set up: Undefined variable \$PUSHOVER_USER in `pwd`/`basename "$0"`."
+	exit
+fi
+
 if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "sipgate" && (( !${#SIPGATE_SMSID} )) ); 
   then
     echo -e "No SMS ID for SMS reception via sipgate set up: Undefined variable \$SIPGATE_SMSID in `pwd`/`basename "$0"` on line 53."
@@ -134,11 +158,6 @@ if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "slack" && (( !${#SLACK_
 	exit
 fi
 
-if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "pagerduty" && (( !${#PD_SERVICE_KEY} )) ); 
-  then
-    echo -e "No PagerDuty service key set up: Undefined variable \$PD_SERVICE_KEY in `pwd`/`basename "$0"`."
-	exit
-fi
 
 ### List which notification methods were used 
 for messagingServices in ${MESSAGING_SERVICES[@]^}; do
@@ -511,6 +530,20 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 
 
     ###############################
+    ########## PUSHOVER ###########
+    ###############################
+
+	if (printf '%s\n' "${MESSAGING_SERVICES[@]}" | grep -xq "pushover"); then
+      curl \
+			  --form-string "token=$PUSHOVER_TOKEN" \
+			  --form-string "user=$PUSHOVER_USER" \
+			  --form-string "sound=siren" \
+			  --form-string "title=$systemdService on `hostname` is DOWN!" \
+			  --form-string "message=Event was logged on `date +"%b$d, %Y at %T (%Z)"`. Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService. | sed 's/\(.*\),/\1 and/'`" \
+			  https://api.pushover.net/1/messages.json
+	fi
+
+    ###############################
     ########## PAGERDUTY ##########
     ###############################
 
@@ -521,7 +554,7 @@ for systemdService in ${SYSTEMD_SERVICES[@]/$SKIP_SERVICES}; do
 			  -d "$systemdService on `hostname` is DOWN!" \
 			  -i "`hostname`-$systemdService" \
 			  -f "Service Description"="`systemctl show $systemdService -p Description | cut -d "=" -f2`" \
-			  -f Notification="Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService | sed 's/\(.*\),/\1 and/'`"
+			  -f Notification="Admin`if [ ${#EMAIL_RECIPIENTS[@]} -gt 1 ]; then echo "s"; fi` has been informed via `echo $messagingService. | sed 's/\(.*\),/\1 and/'`"
 	fi
 
   fi
